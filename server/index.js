@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/auth", authRoute);
-app.use('/api/recipe', recipeRoute);
+app.use('/api/recipes', recipeRoute);
 app.use("/api/saved", saveRecipeRoute);
 
 const PORT = process.env.PORT || 9080;

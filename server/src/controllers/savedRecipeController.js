@@ -1,56 +1,73 @@
 const SavedRecipe = require("../models/savedRecipe.model");
+const mongoose = require("mongoose");
 
-// Save a Recipe
 const saveRecipe = async (req, res) => {
   try {
+    const userId = req.user?.userId; 
     const { recipeId } = req.body;
-    const userId = req.user.userId;
 
-    let savedRecipes = await SavedRecipe.findOne({ userId });
-    if (!savedRecipes) {
-      savedRecipes = new SavedRecipe({ userId, recipes: [] });
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized request" });
     }
 
-    savedRecipes.recipes.push({ recipeId, order: savedRecipes.recipes.length + 1 });
-    await savedRecipes.save();
+    if (!recipeId || !mongoose.Types.ObjectId.isValid(recipeId)) {
+      return res.status(400).json({ error: "Invalid or missing recipeId" });
+    }
 
-    res.status(201).json({ message: "Recipe saved successfully!" });
+    const objectIdRecipe = new mongoose.Types.ObjectId(recipeId);
+
+    console.log("Saving Recipe:", { userId, recipeId });
+
+    let savedRecipe = await SavedRecipe.findOne({ userId });
+
+    if (!savedRecipe) {
+      savedRecipe = new SavedRecipe({
+        userId,
+        recipes: [{ recipeId: objectIdRecipe }],
+      });
+    } else {
+      const alreadySaved = savedRecipe.recipes.some((r) =>
+        r.recipeId.equals(objectIdRecipe)
+      );
+
+      if (alreadySaved) {
+        return res.status(409).json({ error: "Recipe already saved" });
+      }
+
+      savedRecipe.recipes.push({ recipeId: objectIdRecipe });
+    }
+
+    await savedRecipe.save();
+    res.status(201).json({ message: "Recipe saved successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Error saving recipe" });
+    console.error("Error saving recipe:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-// Get Saved Recipes
 const getSavedRecipes = async (req, res) => {
   try {
-    const userId = req.user.userId;
-    const savedRecipes = await SavedRecipe.findOne({ userId }).populate("recipes.recipeId");
+    const userId = req.user?.userId;
 
-    res.json(savedRecipes?.recipes || []);
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized request" });
+    }
+
+    console.log("Fetching saved recipes for user:", userId);
+
+    const savedRecipes = await SavedRecipe.findOne({ userId })
+      .populate("recipes.recipeId", "title image description")
+      .lean();
+
+    if (!savedRecipes || savedRecipes.recipes.length === 0) {
+      return res.status(404).json({ message: "No saved recipes found" });
+    }
+
+    res.status(200).json(savedRecipes.recipes);
   } catch (error) {
-    res.status(500).json({ error: "Error fetching saved recipes" });
+    console.error("Error fetching saved recipes:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-// Reorder Saved Recipes
-const reorderSavedRecipes = async (req, res) => {
-  try {
-    const { newOrder } = req.body; // Array of { recipeId, order }
-    const userId = req.user.userId;
-
-    let savedRecipes = await SavedRecipe.findOne({ userId });
-    if (!savedRecipes) return res.status(404).json({ error: "No saved recipes found" });
-
-    savedRecipes.recipes = newOrder.map((r, index) => ({
-      recipeId: r.recipeId,
-      order: index + 1,
-    }));
-
-    await savedRecipes.save();
-    res.json({ message: "Recipe order updated successfully!" });
-  } catch (error) {
-    res.status(500).json({ error: "Error updating recipe order" });
-  }
-};
-
-module.exports = {saveRecipe, getSavedRecipes, reorderSavedRecipes};
+module.exports = { saveRecipe, getSavedRecipes };

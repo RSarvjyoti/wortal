@@ -1,11 +1,10 @@
 const {Router} = require("express");
-const { saveRecipe, getSavedRecipes, reorderSavedRecipes } = require("../controllers/savedRecipeController");
+const { saveRecipe, getSavedRecipes } = require("../controllers/savedRecipeController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 const saveRecipeRoute = Router();
 
-saveRecipeRoute.post("/save", authMiddleware, saveRecipe);
-saveRecipeRoute.get("/saved", authMiddleware, getSavedRecipes);
-saveRecipeRoute.put("/reorder", authMiddleware, reorderSavedRecipes);
+saveRecipeRoute.post("/recipes", authMiddleware, saveRecipe);
+saveRecipeRoute.get("/recipes", authMiddleware, getSavedRecipes);
 
 module.exports = saveRecipeRoute;
