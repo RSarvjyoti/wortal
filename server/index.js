@@ -11,6 +11,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get('/', (req, res) => {
+    res.send("This is home route.")
+})
+
 app.use("/api/auth", authRoute);
 app.use('/api/recipes', recipeRoute);
 app.use("/api/saved", saveRecipeRoute);
