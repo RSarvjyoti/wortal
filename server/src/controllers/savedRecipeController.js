@@ -3,9 +3,10 @@ const mongoose = require("mongoose");
 
 const saveRecipe = async (req, res) => {
   try {
-    const userId = req.user?.userId; 
-    const { recipeId, title, image } = req.body;
+    const userId = req.user?.userId;
 
+    const { recipeId } = req.body;
+    
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized request" });
     }
@@ -24,8 +25,6 @@ const saveRecipe = async (req, res) => {
       savedRecipe = new SavedRecipe({
         userId,
         recipes: [{ recipeId: objectIdRecipe }],
-        title,
-        image
       });
     } else {
       const alreadySaved = savedRecipe.recipes.some((r) =>
@@ -36,7 +35,7 @@ const saveRecipe = async (req, res) => {
         return res.status(409).json({ error: "Recipe already saved" });
       }
 
-      savedRecipe.recipes.push({ recipeId: objectIdRecipe });
+      savedRecipe.recipes.push({ recipeId: objectIdRecipe, title, image });
     }
 
     await savedRecipe.save();
@@ -46,7 +45,6 @@ const saveRecipe = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 const getSavedRecipes = async (req, res) => {
   try {
