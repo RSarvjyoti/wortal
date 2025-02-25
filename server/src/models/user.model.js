@@ -8,5 +8,5 @@ savedRecipes: [{ type: Schema.Types.ObjectId, ref: "Recipe" }],
 createdAt: { type: Date, default: Date.now },
 });
 
-const User = model("User", userSchema);
+const User = model("users", userSchema);
 module.exports = User;
