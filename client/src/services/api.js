@@ -36,7 +36,7 @@ export const getRecipeDetails = async (id) => {
 
 export const saveRecipe = async (recipeId) => {
   try {
-    const token = localStorage.getItem("token"); // Get token from localStorage
+    const token = localStorage.getItem("token");
     if (!token) {
       alert("Please log in to save recipes.");
       return;
