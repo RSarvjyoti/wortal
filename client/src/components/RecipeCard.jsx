@@ -4,7 +4,7 @@ import { saveRecipe } from "../services/api";
 const RecipeCard = ({ recipe, token, onViewDetails }) => {
   const handleSaveRecipe = async () => {
 
-    console.log(recipe);
+    console.log("recipe >>>", recipe);
     
     const token = localStorage.getItem("token");
     
@@ -14,9 +14,7 @@ const RecipeCard = ({ recipe, token, onViewDetails }) => {
     }
 
     try {
-      
-      await  saveRecipe(recipe.id, token);
-      
+      await  saveRecipe(recipe);
       // alert("Recipe saved successfully!");
     } catch (error) {
       alert(error.message);

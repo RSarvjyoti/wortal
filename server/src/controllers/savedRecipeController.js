@@ -1,50 +1,43 @@
 const SavedRecipe = require("../models/savedRecipe.model");
 const mongoose = require("mongoose");
+const User = require("../models/user.model");
 
 const saveRecipe = async (req, res) => {
-  try {
-    const userId = req.user?.userId;
 
-    const { recipeId } = req.body;
+  const {recipeId, title, image} = req.body;
+
+  try {
+    const user = await User.findById(req.user?.userId);
     
-    if (!userId) {
+    if (!user) {
       return res.status(401).json({ error: "Unauthorized request" });
     }
 
-    if (!recipeId || !mongoose.Types.ObjectId.isValid(recipeId)) {
-      return res.status(400).json({ error: "Invalid or missing recipeId" });
+    let addItems = await SavedRecipe.findOne({userId : req.user?.userId});
+
+    if(!addItems){
+      addItems = new SavedRecipe({userId: req.user?.userId, recipes : []})
     }
 
-    const objectIdRecipe = new mongoose.Types.ObjectId(recipeId);
+    addItems.recipes.push({recipeId, title, image});
 
-    console.log("Saving Recipe:", { userId, recipeId });
+    await addItems.save();
 
-    let savedRecipe = await SavedRecipe.findOne({ userId });
+    return res.status(201).send({
+      message : "Added into fav"
+    })
 
-    if (!savedRecipe) {
-      savedRecipe = new SavedRecipe({
-        userId,
-        recipes: [{ recipeId: objectIdRecipe }],
-      });
-    } else {
-      const alreadySaved = savedRecipe.recipes.some((r) =>
-        r.recipeId.equals(objectIdRecipe)
-      );
 
-      if (alreadySaved) {
-        return res.status(409).json({ error: "Recipe already saved" });
-      }
-
-      savedRecipe.recipes.push({ recipeId: objectIdRecipe, title, image });
-    }
-
-    await savedRecipe.save();
-    res.status(201).json({ message: "Recipe saved successfully" });
-  } catch (error) {
-    console.error("Error saving recipe:", error);
-    res.status(500).json({ error: "Internal server error" });
+  }catch(err) {
+    console.log(err);
+    
+    return res.status(500).send({
+      message : err
+    })
   }
+
 };
+
 
 const getSavedRecipes = async (req, res) => {
   try {
@@ -68,7 +61,7 @@ const getSavedRecipes = async (req, res) => {
       return res.status(404).json({ message: "No saved recipes found" });
     }
 
-    res.status(200).json(savedRecipes.recipes);
+    return res.status(200).json(savedRecipes.recipes);
   } catch (error) {
     console.error("Error fetching saved recipes:", error);
     res.status(500).json({ error: "Internal server error" });

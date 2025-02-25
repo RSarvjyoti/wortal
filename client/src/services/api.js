@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL =  "https://wortal-1.onrender.com/api"
+const API_URL = "http://localhost:8080/api" // "https://wortal-1.onrender.com/api"
 
 export const registerUser = async (userData) => {
   try {
@@ -34,8 +34,9 @@ export const getRecipeDetails = async (id) => {
   }
 };
 
-export const saveRecipe = async (recipeId) => {
-  console.log(recipeId);
+export const saveRecipe = async (recipe) => {
+  console.log(recipe);
+  
   try {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -43,11 +44,11 @@ export const saveRecipe = async (recipeId) => {
       return;
     }
 
-    console.log("Saving Recipe ID:", recipeId);
+    console.log("Saving Recipe ID:", recipe.id);
 
     const response = await axios.post(
       `${API_URL}/saved/recipes`,
-      { recipeId },
+      { recipeId: recipe.id, title:recipe.title, image:recipe.image  },
       {
         headers: { 
           Authorization: `Bearer ${token}`,

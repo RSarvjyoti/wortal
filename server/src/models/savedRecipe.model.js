@@ -11,10 +11,11 @@ const SavedRecipeSchema = new Schema(
     recipes: [
       {
         recipeId: {
-          type: Schema.Types.ObjectId,
-          ref: "savedrecipes",
+          type: Number,
           required: true,
         },
+        image : {type : String},
+        title : {type : String},
       },
     ],
     createdAt: { type: Date, default: Date.now },

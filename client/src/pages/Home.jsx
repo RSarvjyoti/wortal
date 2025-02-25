@@ -41,7 +41,6 @@ const Home = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <h1 className="text-4xl font-bold text-gray-900 mb-8">Featured Recipes</h1>
-
       <div className="relative w-full max-w-4xl overflow-hidden">
         <motion.div
           className="flex gap-6"

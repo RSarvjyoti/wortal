@@ -23,6 +23,8 @@ const SavedRecipes = () => {
 
       try {
         const recipes = await getSavedRecipes(token);
+        console.log(recipes);
+        
         setSavedRecipes(recipes || []);
       } catch (error) {
         console.error("Error fetching saved recipes:", error.message);
