@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL =  "https://wortal-1.onrender.com/api"
+const API_URL = "http://localhost:8080/api" // "https://wortal-1.onrender.com/api"
 
 export const registerUser = async (userData) => {
   try {
@@ -35,6 +35,7 @@ export const getRecipeDetails = async (id) => {
 };
 
 export const saveRecipe = async (recipeId) => {
+  console.log(recipeId);
   try {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -47,7 +48,12 @@ export const saveRecipe = async (recipeId) => {
     const response = await axios.post(
       `${API_URL}/saved/recipes`,
       { recipeId },
-      { headers: { Authorization: `Bearer ${token}` } }
+      {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
     );
 
     alert("Recipe saved successfully!");
@@ -60,7 +66,9 @@ export const saveRecipe = async (recipeId) => {
 
 export const getSavedRecipes = async () => {
   try {
-    const token = localStorage.getItem("token"); // Get token from localStorage
+    const token = localStorage.getItem("token"); 
+    console.log(token);
+    
     if (!token) {
       alert("Please log in to view saved recipes.");
       return;

@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const saveRecipe = async (req, res) => {
   try {
     const userId = req.user?.userId; 
-    const { recipeId } = req.body;
+    const { recipeId, title, image } = req.body;
 
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized request" });
@@ -24,6 +24,8 @@ const saveRecipe = async (req, res) => {
       savedRecipe = new SavedRecipe({
         userId,
         recipes: [{ recipeId: objectIdRecipe }],
+        title,
+        image
       });
     } else {
       const alreadySaved = savedRecipe.recipes.some((r) =>
@@ -45,9 +47,12 @@ const saveRecipe = async (req, res) => {
   }
 };
 
+
 const getSavedRecipes = async (req, res) => {
   try {
     const userId = req.user?.userId;
+    console.log(userId);
+    
 
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized request" });
@@ -56,8 +61,10 @@ const getSavedRecipes = async (req, res) => {
     console.log("Fetching saved recipes for user:", userId);
 
     const savedRecipes = await SavedRecipe.findOne({ userId })
-      .populate("recipes.recipeId", "title image description")
-      .lean();
+ 
+      const getAll = await savedRecipes.recipes
+      console.log(getAll);
+      
 
     if (!savedRecipes || savedRecipes.recipes.length === 0) {
       return res.status(404).json({ message: "No saved recipes found" });

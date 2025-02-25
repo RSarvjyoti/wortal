@@ -10,6 +10,9 @@ const SavedRecipes = () => {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
+  console.log(token);
+  
+
   useEffect(() => {
     const fetchSavedRecipes = async () => {
       if (!token) {

@@ -12,22 +12,14 @@ const SavedRecipeSchema = new Schema(
       {
         recipeId: {
           type: Schema.Types.ObjectId,
-          ref: "recipes",
+          ref: "savedrecipes",
           required: true,
-        },
-        order: {
-          type: Number,
-          required: true,
-          default: 1,
         },
       },
     ],
     createdAt: { type: Date, default: Date.now },
   },
-  { collection: "savedrecipes" } 
 );
-
-SavedRecipeSchema.index({ userId: 1, "recipes.recipeId": 1 }, { unique: true });
 
 const SavedRecipe = model("SavedRecipe", SavedRecipeSchema);
 
