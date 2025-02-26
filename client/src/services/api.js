@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api" // "https://wortal-1.onrender.com/api"
+const API_URL = "https://wortal-1.onrender.com/api"
 
 export const registerUser = async (userData) => {
   try {
